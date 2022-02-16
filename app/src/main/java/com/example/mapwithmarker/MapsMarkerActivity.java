@@ -15,15 +15,26 @@
 package com.example.mapwithmarker;
 
 import android.Manifest;
+import android.content.ContentValues;
+import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.hardware.Camera;
 import android.location.Location;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Parcelable;
+import android.provider.MediaStore;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -41,7 +52,14 @@ public class MapsMarkerActivity extends FragmentActivity
         implements OnMapReadyCallback {
     private Location mLastLocation;
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
+    private static final int CAMERA_PERMISSION_CODE = 2;
+    private static final int CAMERA = 3;
 
+    ImageButton btn_camera;
+    ImageButton btn_help;
+    ImageButton btn_zoomin;
+    ImageButton btn_zoomout;
+    ImageView imageView;
     // [START_EXCLUDE]
     // [START maps_marker_get_map_async]
     private void setUpMap() {
@@ -49,8 +67,6 @@ public class MapsMarkerActivity extends FragmentActivity
             ActivityCompat.requestPermissions(this, new String[]
                     {Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_PERMISSION_REQUEST_CODE);
         }
-
-        return;
     }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,7 +78,37 @@ public class MapsMarkerActivity extends FragmentActivity
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+        btn_camera = (ImageButton) findViewById(R.id.btn_camera);
+        btn_zoomin = (ImageButton) findViewById(R.id.btn_zoomin);
+        btn_zoomout = (ImageButton) findViewById(R.id.btn_zoomout);
+        btn_help = (ImageButton) findViewById(R.id.btn_help);
+        imageView = (ImageView) findViewById(R.id.image_view);
+
+        if(ContextCompat.checkSelfPermission(MapsMarkerActivity.this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(MapsMarkerActivity.this, new String[] {
+                    Manifest.permission.CAMERA
+            }, 100);
+        }
+
+        btn_camera.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                startActivityForResult(intent, 100);
+            }
+        });
+
+
+
         setUpMap();
+    }
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 100) {
+            Bitmap captureImage = (Bitmap) data.getExtras().get("data");
+            imageView.setImageBitmap(captureImage);
+        }
     }
     // [END maps_marker_get_map_async]
     // [END_EXCLUDE]
@@ -89,10 +135,7 @@ public class MapsMarkerActivity extends FragmentActivity
         googleMap.moveCamera(CameraUpdateFactory.zoomTo(15));
         googleMap.moveCamera(CameraUpdateFactory.newLatLng(aalto));
 
-        ImageButton btn_camera = (ImageButton) findViewById(R.id.btn_camera);
-        ImageButton btn_zoomin = (ImageButton) findViewById(R.id.btn_zoomin);
-        ImageButton btn_zoomout = (ImageButton) findViewById(R.id.btn_zoomout);
-        ImageButton btn_help = (ImageButton) findViewById(R.id.btn_help);
+
 
         btn_zoomin.setOnClickListener(new View.OnClickListener() {
             @Override
