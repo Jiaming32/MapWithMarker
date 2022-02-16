@@ -37,6 +37,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
 
+import com.google.android.gms.common.GoogleApiAvailabilityLight;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -56,9 +57,8 @@ public class MapsMarkerActivity extends FragmentActivity
     private static final int CAMERA = 3;
 
     ImageButton btn_camera;
-    ImageButton btn_help;
-    ImageButton btn_zoomin;
     ImageButton btn_zoomout;
+    ImageButton btn_zoomin;
     ImageView imageView;
     // [START_EXCLUDE]
     // [START maps_marker_get_map_async]
@@ -80,9 +80,8 @@ public class MapsMarkerActivity extends FragmentActivity
         mapFragment.getMapAsync(this);
 
         btn_camera = (ImageButton) findViewById(R.id.btn_camera);
-        btn_zoomin = (ImageButton) findViewById(R.id.btn_zoomin);
         btn_zoomout = (ImageButton) findViewById(R.id.btn_zoomout);
-        btn_help = (ImageButton) findViewById(R.id.btn_help);
+        btn_zoomin = (ImageButton) findViewById(R.id.btn_zoomin);
         imageView = (ImageView) findViewById(R.id.image_view);
 
         if(ContextCompat.checkSelfPermission(MapsMarkerActivity.this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
@@ -99,8 +98,6 @@ public class MapsMarkerActivity extends FragmentActivity
             }
         });
 
-
-
         setUpMap();
     }
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
@@ -110,21 +107,7 @@ public class MapsMarkerActivity extends FragmentActivity
             imageView.setImageBitmap(captureImage);
         }
     }
-    // [END maps_marker_get_map_async]
-    // [END_EXCLUDE]
 
-    // [START_EXCLUDE silent]
-    /**
-     * Manipulates the map when it's available.
-     * The API invokes this callback when the map is ready to be used.
-     * This is where we can add markers or lines, add listeners or move the camera. In this case,
-     * we just add a marker near Sydney, Australia.
-     * If Google Play services is not installed on the device, the user receives a prompt to install
-     * Play services inside the SupportMapFragment. The API invokes this method after the user has
-     * installed Google Play services and returned to the app.
-     */
-    // [END_EXCLUDE]
-    // [START maps_marker_on_map_ready_add_marker]
     @Override
     public void onMapReady(GoogleMap googleMap) {
         LatLng aalto = new LatLng(60.185364, 24.825476);
@@ -135,25 +118,26 @@ public class MapsMarkerActivity extends FragmentActivity
         googleMap.moveCamera(CameraUpdateFactory.zoomTo(15));
         googleMap.moveCamera(CameraUpdateFactory.newLatLng(aalto));
 
-
-
-        btn_zoomin.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                googleMap.moveCamera(CameraUpdateFactory.zoomTo(googleMap.getCameraPosition().zoom + 1));
-            }
-        });
-
         btn_zoomout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 googleMap.moveCamera(CameraUpdateFactory.zoomTo(googleMap.getCameraPosition().zoom - 1));
             }
         });
-
-
+        btn_zoomin.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                googleMap.moveCamera(CameraUpdateFactory.zoomTo(googleMap.getCameraPosition().zoom + 1));
+            }
+        });
     }
     // [END maps_marker_on_map_ready_add_marker]
 
+    public void openHelp(View view) {
+        Intent intent = new Intent(this, HelpActivity.class);
+        startActivity(intent);
+    }
+
+    
 }
 // [END maps_marker_on_map_ready]
