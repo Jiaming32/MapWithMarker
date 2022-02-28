@@ -89,7 +89,6 @@ public class MapsMarkerActivity extends FragmentActivity
                     Manifest.permission.CAMERA
             }, 100);
         }
-
         btn_camera.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -97,14 +96,15 @@ public class MapsMarkerActivity extends FragmentActivity
                 startActivityForResult(intent, 100);
             }
         });
-
         setUpMap();
     }
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == 100) {
             Bitmap captureImage = (Bitmap) data.getExtras().get("data");
-            imageView.setImageBitmap(captureImage);
+            Intent intent = new Intent(this, PhotoEditorActivity.class);
+            intent.putExtra("captureImage", captureImage);
+            startActivity(intent);
         }
     }
 
@@ -137,7 +137,9 @@ public class MapsMarkerActivity extends FragmentActivity
         Intent intent = new Intent(this, HelpActivity.class);
         startActivity(intent);
     }
-
-    
+    public void openEditor(View view) {
+        Intent intent = new Intent(this, PhotoEditorActivity.class);
+        startActivity(intent);
+    }
 }
 // [END maps_marker_on_map_ready]
