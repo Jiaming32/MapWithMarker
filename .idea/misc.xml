@@ -3,9 +3,12 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/android-samples-1.6.2/tutorials/java/MapWithMarker/app/src/main/res/drawable/btn_camera.xml" value="0.1895" />
         <entry key="..\:/android-samples-1.6.2/tutorials/java/MapWithMarker/app/src/main/res/drawable/btn_zoomin.xml" value="0.331" />
         <entry key="..\:/android-samples-1.6.2/tutorials/java/MapWithMarker/app/src/main/res/drawable/btn_zoomout.xml" value="0.331" />
+        <entry key="..\:/android-samples-1.6.2/tutorials/java/MapWithMarker/app/src/main/res/drawable/ic_baseline_check_24.xml" value="0.1895" />
         <entry key="..\:/android-samples-1.6.2/tutorials/java/MapWithMarker/app/src/main/res/drawable/ic_baseline_edit_24.xml" value="0.1895" />
+        <entry key="..\:/android-samples-1.6.2/tutorials/java/MapWithMarker/app/src/main/res/layout/activity_canvas.xml" value="0.30052083333333335" />
         <entry key="..\:/android-samples-1.6.2/tutorials/java/MapWithMarker/app/src/main/res/layout/activity_help.xml" value="0.36614583333333334" />
         <entry key="..\:/android-samples-1.6.2/tutorials/java/MapWithMarker/app/src/main/res/layout/activity_main.xml" value="0.36614583333333334" />
         <entry key="..\:/android-samples-1.6.2/tutorials/java/MapWithMarker/app/src/main/res/layout/activity_maps.xml" value="0.25" />

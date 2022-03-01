@@ -7,26 +7,24 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.PixelFormat;
+import android.net.Uri;
+import android.os.Bundle;
+import android.provider.MediaStore;
 import android.util.AttributeSet;
-import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 
 import androidx.annotation.NonNull;
-
-public class MyCanvas extends SurfaceView implements SurfaceHolder.Callback{
+import androidx.annotation.Nullable;
+public class testView extends View {
    Paint paint;
    Path path;
    Canvas canvas;
    Bitmap value;
-   int width, height;
-   public MyCanvas(Context context) {
-      super(context);
-      init(context);
-   }
-   public MyCanvas(Context context, AttributeSet attrs) {
+   public testView(Context context, AttributeSet attrs) {
       super(context, attrs);
       paint = new Paint();
       path = new Path();
@@ -37,30 +35,15 @@ public class MyCanvas extends SurfaceView implements SurfaceHolder.Callback{
       paint.setFilterBitmap(true);
       paint.setDither(true);
       paint.setStrokeWidth(5f);
-      setBackgroundColor(Color.TRANSPARENT);
-      setZOrderOnTop(true);
-      getHolder().setFormat(PixelFormat.TRANSPARENT);
-      getHolder().addCallback(this);
    }
-   public MyCanvas(Context context, AttributeSet attrs, int defStyleAttr) {
-      super(context, attrs, defStyleAttr);
-      init(null);
-   }
-   public MyCanvas(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
-      super(context, attrs, defStyleAttr, defStyleRes);
-      init(null);
-   }
-   private void init(Context context) {
-   }
-   public void setBitmap(Bitmap bitmap, int height, int width) {
+
+   public void setBitmap(Bitmap bitmap) {
       value = bitmap;
-      this.height = height;
-      this.width = width;
    }
+
    protected void onDraw(Canvas canvas) {
       super.onDraw(canvas);
-      //canvas.drawBitmap(Bitmap.createScaledBitmap(value, width,height,true),0,0,paint);
-      canvas.drawBitmap(Bitmap.createScaledBitmap(value, width, value.getHeight(),true), 0, 0,paint);
+      canvas.drawColor(Color.BLUE);
       canvas.drawPath(path, paint);
    }
 
@@ -83,18 +66,4 @@ public class MyCanvas extends SurfaceView implements SurfaceHolder.Callback{
       return true;
    }
 
-   @Override
-   public void surfaceCreated(@NonNull SurfaceHolder surfaceHolder) {
-
-   }
-
-   @Override
-   public void surfaceChanged(@NonNull SurfaceHolder surfaceHolder, int i, int i1, int i2) {
-
-   }
-
-   @Override
-   public void surfaceDestroyed(@NonNull SurfaceHolder surfaceHolder) {
-
-   }
 }

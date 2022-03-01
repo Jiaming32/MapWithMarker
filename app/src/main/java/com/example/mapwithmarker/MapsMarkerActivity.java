@@ -130,14 +130,6 @@ public class MapsMarkerActivity extends FragmentActivity
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            //Bitmap captureImage = (Bitmap) data.getExtras().get("data");
-            //Intent intent = new Intent(this, PhotoEditorActivity.class);
-            //intent.putExtra("captureImage", captureImage);
-            //startActivity(intent);
-
-            //intent.setDataAndType(Uri.fromFile(tmpFile), "image/jpeg");
-            //intent.putExtra("captureImage", tmpFile);
-
         }
     }
 
