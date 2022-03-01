@@ -110,7 +110,6 @@ public class MapsMarkerActivity extends FragmentActivity
                 cv.put(MediaStore.Images.Media.DESCRIPTION, "From Camera");
                 tmpFileURI = getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, cv);
                 Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-
                 intent.putExtra(MediaStore.EXTRA_OUTPUT, tmpFileURI);
                 startActivityForResult(intent, 1337);
             }
@@ -123,7 +122,6 @@ public class MapsMarkerActivity extends FragmentActivity
             //Bitmap captureImage = (Bitmap) data.getExtras().get("data");
             try {
                 Bitmap captureImage = MediaStore.Images.Media.getBitmap(getContentResolver(), tmpFileURI);
-
                 Intent intent = new Intent(this, PhotoEditorActivity.class);
                 intent.putExtra("captureImageURI", tmpFileURI.toString());
                 startActivity(intent);

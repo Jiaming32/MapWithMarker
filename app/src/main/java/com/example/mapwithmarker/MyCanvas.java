@@ -1,5 +1,7 @@
 package com.example.mapwithmarker;
 
+import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -7,19 +9,36 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.PixelFormat;
+import android.net.Uri;
+import android.os.Environment;
+import android.os.SystemClock;
+import android.provider.MediaStore;
 import android.util.AttributeSet;
-import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
-import android.view.View;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.Objects;
 
 public class MyCanvas extends SurfaceView implements SurfaceHolder.Callback{
    Paint paint;
    Path path;
    Bitmap value;
+   Bitmap bmpBase;
+   Canvas canvas;
+   ContentValues cv = new ContentValues();
+   FileOutputStream outputStream;
+   Uri imageUri;
+
    public MyCanvas(Context context) {
       super(context);
       init();
@@ -50,6 +69,7 @@ public class MyCanvas extends SurfaceView implements SurfaceHolder.Callback{
       setZOrderOnTop(true);
       getHolder().setFormat(PixelFormat.TRANSPARENT);
       getHolder().addCallback(this);
+      setDrawingCacheEnabled(true);
    }
 
    public void setBitmap(Bitmap bitmap) {
@@ -79,6 +99,25 @@ public class MyCanvas extends SurfaceView implements SurfaceHolder.Callback{
       }
       invalidate();
       return true;
+   }
+   public String finishEdit(Context context) throws FileNotFoundException {
+      ContentResolver resolver = context.getContentResolver();
+      try {
+         cv.put(MediaStore.MediaColumns.DISPLAY_NAME, SystemClock.currentThreadTimeMillis() + ".jpeg");
+         cv.put(MediaStore.MediaColumns.MIME_TYPE, "image/jpeg");
+         cv.put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_PICTURES + File.separator + "TestFolder");
+         imageUri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, cv);
+
+         outputStream = (FileOutputStream) resolver.openOutputStream(Objects.requireNonNull(imageUri));
+         Bitmap temp = this.getDrawingCache();
+         temp.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
+         Objects.requireNonNull(outputStream);
+         Toast.makeText(context, "Image saved", Toast.LENGTH_SHORT).show();
+
+      } catch (IOException e) {
+         Toast.makeText(context, "Image not saved " + e.getMessage(), Toast.LENGTH_SHORT).show();
+      }
+      return imageUri.toString();
    }
 
    @Override
