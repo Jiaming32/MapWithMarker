@@ -19,15 +19,24 @@ import androidx.annotation.NonNull;
 public class MyCanvas extends SurfaceView implements SurfaceHolder.Callback{
    Paint paint;
    Path path;
-   Canvas canvas;
    Bitmap value;
-   int width, height;
    public MyCanvas(Context context) {
       super(context);
-      init(context);
+      init();
    }
    public MyCanvas(Context context, AttributeSet attrs) {
       super(context, attrs);
+      init();
+   }
+   public MyCanvas(Context context, AttributeSet attrs, int defStyleAttr) {
+      super(context, attrs, defStyleAttr);
+      init();
+   }
+   public MyCanvas(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+      super(context, attrs, defStyleAttr, defStyleRes);
+      init();
+   }
+   private void init() {
       paint = new Paint();
       path = new Path();
       paint.setAntiAlias(true);
@@ -42,25 +51,14 @@ public class MyCanvas extends SurfaceView implements SurfaceHolder.Callback{
       getHolder().setFormat(PixelFormat.TRANSPARENT);
       getHolder().addCallback(this);
    }
-   public MyCanvas(Context context, AttributeSet attrs, int defStyleAttr) {
-      super(context, attrs, defStyleAttr);
-      init(null);
-   }
-   public MyCanvas(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
-      super(context, attrs, defStyleAttr, defStyleRes);
-      init(null);
-   }
-   private void init(Context context) {
-   }
-   public void setBitmap(Bitmap bitmap, int height, int width) {
+
+   public void setBitmap(Bitmap bitmap) {
       value = bitmap;
-      this.height = height;
-      this.width = width;
+      invalidate();
    }
    protected void onDraw(Canvas canvas) {
       super.onDraw(canvas);
-      //canvas.drawBitmap(Bitmap.createScaledBitmap(value, width,height,true),0,0,paint);
-      canvas.drawBitmap(Bitmap.createScaledBitmap(value, width, value.getHeight(),true), 0, 0,paint);
+      canvas.drawBitmap(Bitmap.createScaledBitmap(value, this.getWidth(), value.getHeight(),true), 0, 0,paint);
       canvas.drawPath(path, paint);
    }
 

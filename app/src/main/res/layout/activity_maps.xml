@@ -61,7 +61,7 @@
         android:layout_alignParentBottom="true"
         android:layout_marginEnd="12dp"
         android:layout_marginBottom="119dp"
-        android:src="@drawable/btn_help"
+        android:src="@drawable/ic_baseline_edit_24"
         android:onClick="openEditor"
         />
 
