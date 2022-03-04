@@ -14,50 +14,56 @@
 
 package com.example.mapwithmarker;
 
+import static android.media.ExifInterface.TAG_ARTIST;
+import static android.media.ExifInterface.TAG_GPS_LATITUDE;
+import static android.media.ExifInterface.TAG_GPS_LATITUDE_REF;
+import static android.media.ExifInterface.TAG_GPS_LONGITUDE_REF;
+import static android.media.ExifInterface.TAG_IMAGE_DESCRIPTION;
+import static android.media.ExifInterface.TAG_USER_COMMENT;
+
 import android.Manifest;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.hardware.Camera;
 import android.location.Location;
+import android.media.ExifInterface;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
-import android.os.Parcelable;
 import android.provider.MediaStore;
-import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.core.content.FileProvider;
 import androidx.fragment.app.FragmentActivity;
 
-import com.google.android.gms.common.GoogleApiAvailabilityLight;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.URI;
+import java.io.InputStream;
+import java.io.Serializable;
+import java.util.ArrayList;
 
 /**
  * An activity that displays a Google map with a marker (pin) to indicate a particular location.
  */
 // [START maps_marker_on_map_ready]
 public class MapsMarkerActivity extends FragmentActivity
-        implements OnMapReadyCallback {
+        implements OnMapReadyCallback, GoogleMap.OnInfoWindowClickListener {
     private Location mLastLocation;
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
     private static final int CAMERA_PERMISSION_CODE = 2;
@@ -68,7 +74,10 @@ public class MapsMarkerActivity extends FragmentActivity
     ImageButton btn_zoomout;
     ImageButton btn_zoomin;
     ImageView imageView;
-    MyCanvas myCanvas;
+    Marker newMark;
+    ArrayList<Uri> uriList = new ArrayList<Uri>();
+    ArrayList<Mark> markList = new ArrayList<>();
+    Uri testUri = null;
     // [START_EXCLUDE]
     // [START maps_marker_get_map_async]
 
@@ -114,8 +123,30 @@ public class MapsMarkerActivity extends FragmentActivity
                 startActivityForResult(intent, 1337);
             }
         });
+
         setUpMap();
     }
+
+    private void parseUri(GoogleMap googleMap) throws IOException {
+        for(Uri uri: uriList ) {
+            InputStream in = getContentResolver().openInputStream(uri);
+            ExifInterface ef = new ExifInterface(in);
+            String markName = ef.getAttribute(TAG_USER_COMMENT);
+            String markDescription = ef.getAttribute(TAG_IMAGE_DESCRIPTION);
+            String markAuthor = ef.getAttribute(TAG_ARTIST);
+            float markLatitude = Float.parseFloat(ef.getAttribute(TAG_GPS_LATITUDE_REF));
+            float markLongitude = Float.parseFloat(ef.getAttribute(TAG_GPS_LONGITUDE_REF));
+
+
+            LatLng location = new LatLng(markLatitude, markLongitude);
+            newMark = googleMap.addMarker(new MarkerOptions()
+                    .position(location)
+                    .title(markName)
+                    .snippet("This is my spot!"));
+            markList.add(new Mark(newMark, markDescription, markAuthor, 0,0, uri));
+        }
+    }
+
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == 1337) {
@@ -133,13 +164,30 @@ public class MapsMarkerActivity extends FragmentActivity
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        LatLng aalto = new LatLng(60.185364, 24.825476);
+        //LatLng aalto = new LatLng(60.185364, 24.825476);
+        /*
         googleMap.addMarker(new MarkerOptions()
             .position(aalto)
             .title("Marker in Aalto"));
         googleMap.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
         googleMap.moveCamera(CameraUpdateFactory.zoomTo(15));
         googleMap.moveCamera(CameraUpdateFactory.newLatLng(aalto));
+        */
+
+        String imageUri = getIntent().getStringExtra("imageUri");
+        newMark = googleMap.addMarker(new MarkerOptions()
+                .position(new LatLng(60.185364, 24.825476))
+                .title("markName")
+                .snippet("This is my spot!"));
+        if(imageUri != null) {
+            uriList.add(Uri.parse(imageUri));
+            try {
+                parseUri(googleMap);
+                displayMark(googleMap);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
 
         btn_zoomout.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -153,6 +201,19 @@ public class MapsMarkerActivity extends FragmentActivity
                 googleMap.moveCamera(CameraUpdateFactory.zoomTo(googleMap.getCameraPosition().zoom + 1));
             }
         });
+
+    }
+
+    private void displayMark(GoogleMap googleMap) {
+        for (Mark mark: markList) {
+            Toast.makeText(this, newMark.getTitle(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, mark.description, Toast.LENGTH_SHORT).show();
+
+            googleMap.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
+            googleMap.moveCamera(CameraUpdateFactory.zoomTo(15));
+            googleMap.moveCamera(CameraUpdateFactory.newLatLng(newMark.getPosition()));
+        }
+        googleMap.setOnInfoWindowClickListener(this);
     }
     // [END maps_marker_on_map_ready_add_marker]
 
@@ -161,8 +222,23 @@ public class MapsMarkerActivity extends FragmentActivity
         startActivity(intent);
     }
     public void openEditor(View view) {
-        Intent intent = new Intent(this, PhotoEditorActivity.class);
+        Intent intent = new Intent(this, MarkerDetail.class);
+        Mark test = new Mark(newMark,"asdasdasd", "", 1,1, testUri);
+        intent.putExtra("marker", test);
         startActivity(intent);
+    }
+
+    @Override
+    public void onInfoWindowClick(@NonNull Marker marker) {
+        //Toast.makeText(this, marker.toString(), Toast.LENGTH_SHORT).show();
+        for (Mark mark: markList) {
+            if(marker.equals(mark.marker)) {
+                Toast.makeText(this, mark.marker.getTitle(), Toast.LENGTH_SHORT).show();
+                Intent test = new Intent(this, MarkerDetail.class);
+                test.putExtra("marker", (Serializable) "asd");
+                startActivity(test);
+            }
+        }
     }
 }
 // [END maps_marker_on_map_ready]
